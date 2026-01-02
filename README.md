@@ -1,1 +1,1 @@
-`git checkout chunkinaround/crimbo2025.git`
+`git checkout https://github.com/dizzydis/crimbo2025_checklist main`
