@@ -69,7 +69,7 @@ gummi fingerbone
 
 //Crymbocurrency
 
-//Coinmaster shit 
+//Coinmaster shit
 boolean[item] CoinmasterItems = $items[
 
 messenger parrot egg,
@@ -94,6 +94,7 @@ cursed ship's lantern,
 heat-resistant harpoon pistol,
 undertakers' forceps,
 bone-polishing rag,
+volatile bone bomb,
 
 tiny plastic skeleton rib cage,
 tiny plastic skeleton skull,
@@ -124,7 +125,7 @@ burnt skull
 
 int get_CrymbocurrencyCost(item cost){
 switch (cost) {
-    default: 
+    default:
     return 0;
 
 case $item[messenger parrot egg]:return 200;
@@ -159,7 +160,7 @@ case $item[tiny plastic skeleton Crimbo hat]:return 1500;
 
 int get_TurnInValue(item crym){
 switch (crym) {
-    default: 
+    default:
     return 0;
 
 case $item[burnt incisor]:return 1;
@@ -203,25 +204,27 @@ void main() {
     Foreach crimboLoc in CrimboMonLoc {
 
 
-    #gets a list of all monster drops from the location set that start with the letter and are pizzable
-    #also appends all drops to a buffer for use in the crafting section later
-    monster [int] monster_list = get_monsters(crimboLoc);
-    foreach mon in monster_list {
-    float[item] drops = item_drops(monster_list[mon]);
+        #gets a list of all monster drops from the location set that start with the letter and are pizzable
+        #also appends all drops to a buffer for use in the crafting section later
+        monster [int] monster_list = get_monsters(crimboLoc);
+        foreach mon in monster_list {
+            float[item] drops = item_drops(monster_list[mon]);
             print(monster_list[mon] + " in " + crimboLoc);
-        foreach i in drops {
-            if (TrophyItems contains i ){
-                continue;
-            }
-            string MonsterDropString = "You have "+ available_amount(i) + " "+i;
-                    if (available_amount(i)>0){
-            print(MonsterDropString,"green");
-        } else {
-            print(MonsterDropString,"red");
+            foreach i in drops {
+                if (TrophyItems contains i ){
+                    continue;
+                }
+                int totalAmt = (available_amount(i) + display_amount(i));
+                string MonsterDropString = "You have "+ totalAmt + " "+i+". ("+display_amount(i)+" in DC)";
 
-        }
+                if ( totalAmt > 0 ) {
+                    print(MonsterDropString,"green");
+                } else {
+                    print(MonsterDropString,"red");
+                }
             }
-    }
+            print("");
+        }
     }
 
     print("--------------------------------------------------------------","blue");
@@ -230,16 +233,22 @@ void main() {
 
     Foreach CoinmasterItem in CoinmasterItems{
 
-        string CoinMessage = CoinmasterItem + " have: "+available_amount(CoinmasterItem)+" | Mall:"+to_string(mall_price(CoinmasterItem),"%,d")+" Cost:"+to_string(get_CrymbocurrencyCost(CoinmasterItem),"%,d")+ " Implied Rt: "+to_string((mall_price(CoinmasterItem)/get_CrymbocurrencyCost(CoinmasterItem)),"%,d")+ " meat/ccy";
-
-        if (available_amount(CoinmasterItem)>0){
+        int totalCoinMasterAmount = (available_amount(CoinmasterItem) + display_amount(CoinmasterItem));
+        string CoinMessage = CoinmasterItem + " have: "+ totalCoinMasterAmount +" ("+display_amount(CoinmasterItem)+" in DC).";
+        string CoinMessage2 = "";
+        if (CoinmasterItem != $item[volatile bone bomb] ) {
+            CoinMessage2 = "____Mall:"+to_string(mall_price(CoinmasterItem),"%,d")+" Cost:"+to_string(get_CrymbocurrencyCost(CoinmasterItem),"%,d")+ " Implied Rt: "+to_string((mall_price(CoinmasterItem)/get_CrymbocurrencyCost(CoinmasterItem)),"%,d")+ " meat/ccy";
+        }
+        if ( totalCoinMasterAmount > 0 ) {
             print(CoinMessage,"green");
-            #print(CoinmasterItem + " have: "+available_amount(CoinmasterItem)+" | Mall:"+mall_price(CoinmasterItem)+" CC:"+get_CrymbocurrencyCost(CoinmasterItem)+ " Implied Rt: "+(mall_price(CoinmasterItem)/get_CrymbocurrencyCost(CoinmasterItem)),"green"); 
-            #print(mall_price(CoinmasterItem),"green"); 
+            print(CoinMessage2,"green");
+            #print(CoinmasterItem + " have: "+available_amount(CoinmasterItem)+" | Mall:"+mall_price(CoinmasterItem)+" CC:"+get_CrymbocurrencyCost(CoinmasterItem)+ " Implied Rt: "+(mall_price(CoinmasterItem)/get_CrymbocurrencyCost(CoinmasterItem)),"green");
+            #print(mall_price(CoinmasterItem),"green");
             #print(get_CrymbocurrencyCost(CoinmasterItem));
             #print( (mall_price(CoinmasterItem)/get_CrymbocurrencyCost(CoinmasterItem)));
         } else {
             print(CoinMessage,"red");
+            print(CoinMessage2,"red");
             #print(CoinmasterItem,"red");
             #print(mall_price(CoinmasterItem));
             #print(get_CrymbocurrencyCost(CoinmasterItem));
@@ -253,9 +262,10 @@ void main() {
     int PotentialCrymbocurrency =0;
 
     Foreach TrophyItem in TrophyItems{
-        string TrophyMessage = TrophyItem + " have:"+available_amount(TrophyItem);
-        PotentialCrymbocurrency += (available_amount(TrophyItem)*get_TurnInValue(TrophyItem));
-        if (available_amount(TrophyItem)>0){
+        int totalTrophyItemAmount = (available_amount(TrophyItem) + display_amount(TrophyItem));
+        string TrophyMessage = TrophyItem + " have:"+totalTrophyItemAmount+" ("+display_amount(TrophyItem)+" in DC)";
+        PotentialCrymbocurrency += (totalTrophyItemAmount*get_TurnInValue(TrophyItem));
+        if ( totalTrophyItemAmount > 0 ){
             print(TrophyMessage,"green");
         } else {
             print(TrophyMessage,"red");
@@ -269,8 +279,10 @@ void main() {
     print("Items recieved from Tammy");
 
     Foreach TammyItem in TammyItems {
-        if (available_amount(TammyItem) > 0) {
-            print(TammyItem,"green");
+        int totalTammyItemAmount = ( available_amount(TammyItem) + display_amount(TammyItem) );
+        string TammyMessage = TammyItem + " have: "+totalTammyItemAmount+" ("+display_amount(TammyItem)+" in DC)";
+        if ( totalTammyItemAmount > 0) {
+            print(TammyMessage,"green");
         } else {
             print("You are missing "+TammyItem+" go talk to Tammy!","red");
         }
@@ -283,8 +295,9 @@ void main() {
 
 
     Foreach LeaderboardItem in LeaderboardItems {
-        string leaderboardString  = LeaderboardItem+" have:" + available_amount(LeaderboardItem);
-        if (available_amount(LeaderboardItem) > 0) {
+        int totalLeaderboardItemAmount = ( available_amount(LeaderboardItem) + display_amount(LeaderboardItem) );
+        string leaderboardString  = LeaderboardItem+" have:" + totalLeaderboardItemAmount+" ("+display_amount(LeaderboardItem)+" in DC)";
+        if ( totalLeaderboardItemAmount > 0 ) {
             print(leaderboardString,"green");
         } else {
             print(leaderboardString,"red");
