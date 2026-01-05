@@ -44,7 +44,7 @@ boolean[item] Crimbo2025 = $items[
   Shanty: Who's Going to Pay This Drunken Sailor?,
   Shanty: Who's Going to Pay This Drunken Sailor? (used),
   Shanty: Only Dogs Love a Drunken Sailor,
-  Shanty: Only Dogs Love Drunken Sailors (used),
+  Shanty: Only Dogs Love a Drunken Sailor (used),
   Crymbocurrency tattoo,
   fireproof bonesaw,
   vermiculite shield,
